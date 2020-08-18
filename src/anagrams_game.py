@@ -1,13 +1,15 @@
 'A game where you find anagrams for words, starting easy and getting harder'
 
 from random import choice
-from typing import List
-from anagrams import Anagrams, AnagramsList
-from words import words_from_file
+from typing import List, Dict
+
+from anagrams import Anagrams, AnagramGroup
+from words import words_from_file, words_by_length
 
 MIN_WORD_LEN = 3
 anagrams = Anagrams(words_from_file('resources/many-words.txt'), MIN_WORD_LEN)
-common_words = set(words_from_file('resources/common-words.txt'))
+common_words = (word for word in words_from_file('resources/common-words.txt') if word in anagrams.words)
+common_words_by_length: Dict[int, List[str]] = words_by_length(common_words)
 
 current_word_length = MIN_WORD_LEN
 correct_answers = 0
@@ -19,11 +21,8 @@ provide must be in my larger list of 50,000 words. We'll start easy and get hard
 ''')
 
 while True:
-    anagram_lists: AnagramsList = anagrams.get_with_word_length(current_word_length)
-    chosen_anagrams: List[str] = choice(anagram_lists)
-    chosen_word: str = choice(chosen_anagrams)
-    if chosen_word not in common_words: continue
-    anagrams_of_chosen_word = [word for word in chosen_anagrams if word != chosen_word]
+    chosen_word: str = choice(common_words_by_length[current_word_length])
+    anagrams_of_chosen_word: AnagramGroup = anagrams.of(chosen_word)
     answer = input(f'{chosen_word}? ')
     if answer in anagrams_of_chosen_word:
         correct_answers += 1
