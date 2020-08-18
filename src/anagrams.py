@@ -23,8 +23,8 @@ class Anagrams:
     def of(self, word) -> AnagramGroup:
         'Return anagrams of the word given'
         sorted_letters = ''.join(sorted(word))
-        ag: AnagramGroup = self.anagram_group_by_sorted_letters[sorted_letters]
-        return [anagram for anagram in ag if anagram != word]
+        group: AnagramGroup = self.anagram_group_by_sorted_letters.get(sorted_letters, [])
+        return [anagram for anagram in group if anagram != word]
 
     def _get_lists_by_length(self, min_word_len: int) -> List[AnagramGroups]:
         return [self._anagrams_of_length(l) for l in range(min_word_len, self.longest_word_length + 1)]
@@ -42,8 +42,3 @@ class Anagrams:
         self.anagram_groups: AnagramGroups = [word_list for word_list in self.anagram_group_by_sorted_letters.values()
                                               if len(word_list) > 1]
         self.words = set(chain.from_iterable((word for word in (ag for ag in self.anagram_groups))))
-
-
-if __name__ == '__main__':
-    anagrams = Anagrams(['abet', 'bate', 'beat', 'beta', 'abel', 'able', 'bale',
-                         'abets', 'baste', 'bates', 'beast', 'beats'], 4)
