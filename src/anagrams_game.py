@@ -1,6 +1,6 @@
 'A game where you find anagrams for words, starting easy and getting harder'
 
-from random import choice
+from random import randint
 from typing import List, Dict
 
 from anagrams import Anagrams, AnagramGroup
@@ -21,7 +21,9 @@ provide must be in my larger list of 50,000 words. We'll start easy and get hard
 ''')
 
 while True:
-    chosen_word: str = choice(common_words_by_length[current_word_length])
+    words_of_current_length = common_words_by_length[current_word_length]
+    random_word_index = randint(0, len(words_of_current_length) - 1)
+    chosen_word: str = words_of_current_length.pop(random_word_index)
     anagrams_of_chosen_word: AnagramGroup = anagrams.of(chosen_word)
     answer = input(f'{chosen_word}? ')
     if answer in anagrams_of_chosen_word:
