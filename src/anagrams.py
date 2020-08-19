@@ -1,19 +1,24 @@
 'Creates lists of anagrams using the algorithm described in Programming Perls'
 
-from typing import List, Iterable, Dict
+from typing import List, Iterable, Dict, Set
 from itertools import chain
 
-AnagramGroup  = List[str]           # ['eat', 'tea']
-AnagramGroups = List[AnagramGroup]  # [['eat', 'tea'], ['pot', 'opt', 'top']]
+AnagramGroup   = List[str]                  # ['eat', 'tea']
+AnagramGroups  = List[AnagramGroup]         # [['eat', 'tea'], ['pot', 'opt', 'top']]
+GroupsBySorted = Dict[str, AnagramGroup]    # { 'aet': ['eat', 'tea'] }
+MIN_WORD_LEN = 3
 
 
 class Anagrams:
-    def __init__(self, words: Iterable[str], min_word_len: int):
+    def __init__(self, words: Iterable[str]):
         words_list = list(words)
-        self.min_word_len = min_word_len
-        self._create_anagrams_list(words_list)
-        self.longest_word_length: int = max((len(word[0]) for word in self.anagram_groups))
-        self.lists_by_length: List[AnagramGroups] = self._get_lists_by_length(min_word_len)
+        self.min_word_len = MIN_WORD_LEN
+        self.groups_by_sorted_letters: GroupsBySorted = self._create_groups_by_sorted_letters(words_list)
+        self.groups: AnagramGroups = [word_list for word_list in self.groups_by_sorted_letters.values()
+                                      if len(word_list) > 1]
+        self.words: Set[str] = self._create_word_set()
+        self.longest_word_length: int = max((len(word[0]) for word in self.groups))
+        self.lists_by_length: List[AnagramGroups] = self._get_lists_by_length(MIN_WORD_LEN)
 
     def of_length(self, length) -> AnagramGroups:
         'Return groups where the words have the length given'
@@ -23,22 +28,25 @@ class Anagrams:
     def of(self, word) -> AnagramGroup:
         'Return anagrams of the word given'
         sorted_letters = ''.join(sorted(word))
-        group: AnagramGroup = self.anagram_group_by_sorted_letters.get(sorted_letters, [])
+        group: AnagramGroup = self.groups_by_sorted_letters.get(sorted_letters, [])
         return [anagram for anagram in group if anagram != word]
 
     def _get_lists_by_length(self, min_word_len: int) -> List[AnagramGroups]:
         return [self._anagrams_of_length(l) for l in range(min_word_len, self.longest_word_length + 1)]
 
     def _anagrams_of_length(self, word_length: int) -> AnagramGroups:
-        return [a for a in self.anagram_groups if len(a[0]) == word_length]
+        return [a for a in self.groups if len(a[0]) == word_length]
 
-    def _create_anagrams_list(self, words) -> None:
-        self.anagram_group_by_sorted_letters: Dict[str, AnagramGroup] = {}
+    @staticmethod
+    def _create_groups_by_sorted_letters(words):
+        groups: Dict[str, AnagramGroup] = {}
         for word in words:
             word_sorted = ''.join(sorted(word))
-            anagram_list = self.anagram_group_by_sorted_letters.get(word_sorted, [])
+            anagram_list = groups.get(word_sorted, [])
             anagram_list.append(word)
-            self.anagram_group_by_sorted_letters[word_sorted] = anagram_list
-        self.anagram_groups: AnagramGroups = [word_list for word_list in self.anagram_group_by_sorted_letters.values()
-                                              if len(word_list) > 1]
-        self.words = set(chain.from_iterable((word for word in (ag for ag in self.anagram_groups))))
+            groups[word_sorted] = anagram_list
+        return groups
+
+    def _create_word_set(self) -> Set[str]:
+        groups_of_words: Iterable[AnagramGroup] = (word for word in (group for group in self.groups))
+        return set(chain.from_iterable(groups_of_words))

@@ -6,12 +6,11 @@ from typing import List, Dict
 from anagrams import Anagrams, AnagramGroup
 from words import words_from_file, words_by_length
 
-MIN_WORD_LEN = 3
-anagrams = Anagrams(words_from_file('resources/many-words.txt'), MIN_WORD_LEN)
+anagrams = Anagrams(words_from_file('resources/many-words.txt'))
 common_words = (word for word in words_from_file('resources/common-words.txt') if word in anagrams.words)
 common_words_by_length: Dict[int, List[str]] = words_by_length(common_words)
 
-current_word_length = MIN_WORD_LEN
+current_word_length = anagrams.min_word_len
 correct_answers = 0
 
 print('''

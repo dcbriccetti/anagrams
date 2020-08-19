@@ -6,10 +6,8 @@ from anagrams import Anagrams
 class TestAnagrams(TestCase):
 
     def setUp(self) -> None:
-        self.anagrams = Anagrams([
-            'abet', 'bate', 'beat', 'beta',
-            'abel', 'able', 'bale',
-            'abets', 'baste', 'bates', 'beast', 'beats'], 4)
+        self.anagrams = Anagrams(
+            ['abet', 'bate', 'beat', 'beta', 'abel', 'able', 'bale', 'abets', 'baste', 'bates', 'beast', 'beats'])
 
     def test_of_length(self):
         self.assertEqual(2, len(self.anagrams.of_length(4)))
