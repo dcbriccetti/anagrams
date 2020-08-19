@@ -21,8 +21,8 @@ provide must be in my larger list of 50,000 words. We'll start easy and get hard
 ''')
 
 while True:
-    words_of_current_length = common_words_by_length[current_word_length]
-    random_word_index = randint(0, len(words_of_current_length) - 1)
+    words_of_current_length: List[str] = common_words_by_length[current_word_length]
+    random_word_index: int = randint(0, len(words_of_current_length) - 1)
     chosen_word: str = words_of_current_length.pop(random_word_index)
     anagrams_of_chosen_word: AnagramGroup = anagrams.of(chosen_word)
     answer = input(f'{chosen_word}? ')
