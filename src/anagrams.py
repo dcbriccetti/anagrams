@@ -3,8 +3,8 @@
 from typing import List, Iterable, Dict
 from itertools import chain
 
-AnagramGroup = List[str]
-AnagramGroups = List[AnagramGroup]
+AnagramGroup  = List[str]           # ['eat', 'tea']
+AnagramGroups = List[AnagramGroup]  # [['eat', 'tea'], ['pot', 'opt', 'top']]
 
 
 class Anagrams:
