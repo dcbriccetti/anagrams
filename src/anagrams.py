@@ -1,7 +1,7 @@
 'Creates lists of anagrams using the algorithm described in Programming Perls'
-
-from typing import List, Iterable, Dict, Set
 from itertools import chain
+from random import randint, choice
+from typing import List, Iterable, Dict, Set
 
 AnagramGroup   = List[str]                  # ['eat', 'tea']
 AnagramGroups  = List[AnagramGroup]         # [['eat', 'tea'], ['pot', 'opt', 'top']]
@@ -10,20 +10,16 @@ MIN_WORD_LEN = 3
 
 
 class Anagrams:
-    def __init__(self, words: Iterable[str]):
-        words_list = list(words)
+    def __init__(self, many_words: Iterable[str], common_words: Iterable[str]):
+        words_list = list(many_words)
+        self.common_set = set(common_words)
         self.min_word_len = MIN_WORD_LEN
         self.groups_by_sorted_letters: GroupsBySorted = self._create_groups_by_sorted_letters(words_list)
         self.groups: AnagramGroups = [word_list for word_list in self.groups_by_sorted_letters.values()
-                                      if len(word_list) > 1]
+                                      if len([word for word in word_list if word in self.common_set]) > 1]
         self.words: Set[str] = self._create_word_set()
         self.longest_word_length: int = max((len(word[0]) for word in self.groups))
         self.lists_by_length: List[AnagramGroups] = self._get_lists_by_length(MIN_WORD_LEN)
-
-    def of_length(self, length) -> AnagramGroups:
-        'Return groups where the words have the length given'
-        list_index = length - self.min_word_len
-        return self.lists_by_length[list_index]
 
     def of(self, word) -> AnagramGroup:
         'Return anagrams of the word given'
@@ -31,8 +27,15 @@ class Anagrams:
         group: AnagramGroup = self.groups_by_sorted_letters.get(sorted_letters, [])
         return [anagram for anagram in group if anagram != word]
 
+    def randomly_select_group(self, length=None) -> (str, List[str]):
+        groups: AnagramGroups = self.lists_by_length[length - MIN_WORD_LEN] if length else self.groups
+        index = randint(0, len(groups) - 1)
+        group = groups.pop(index)
+        indexes_of_common = [i for i in range(len(group)) if group[i] in self.common_set]
+        return group.pop(choice(indexes_of_common)), group
+
     def _get_lists_by_length(self, min_word_len: int) -> List[AnagramGroups]:
-        return [self._anagrams_of_length(l) for l in range(min_word_len, self.longest_word_length + 1)]
+        return [self._anagrams_of_length(length) for length in range(min_word_len, self.longest_word_length + 1)]
 
     def _anagrams_of_length(self, word_length: int) -> AnagramGroups:
         return [a for a in self.groups if len(a[0]) == word_length]
