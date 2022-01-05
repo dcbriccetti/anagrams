@@ -10,16 +10,24 @@ MIN_WORD_LEN = 3
 
 
 class Anagrams:
+    common_set: set[str]
+    min_word_len: int
+    groups_by_sorted_letters: GroupsBySorted
+    groups: AnagramGroups
+    words: set[str]
+    longest_word_length: int
+    lists_by_length: List[AnagramGroups]
+
     def __init__(self, many_words: Iterable[str], common_words: Iterable[str]):
         words_list = list(many_words)
         self.common_set = set(common_words)
         self.min_word_len = MIN_WORD_LEN
-        self.groups_by_sorted_letters: GroupsBySorted = self._create_groups_by_sorted_letters(words_list)
-        self.groups: AnagramGroups = [word_list for word_list in self.groups_by_sorted_letters.values()
-                                      if len([word for word in word_list if word in self.common_set]) > 1]
-        self.words: Set[str] = self._create_word_set()
-        self.longest_word_length: int = max((len(word[0]) for word in self.groups))
-        self.lists_by_length: List[AnagramGroups] = self._get_lists_by_length(MIN_WORD_LEN)
+        self.groups_by_sorted_letters = self._create_groups_by_sorted_letters(words_list)
+        self.groups = [word_list for word_list in self.groups_by_sorted_letters.values()
+                       if len([word for word in word_list if word in self.common_set]) > 1]
+        self.words = self._create_word_set()
+        self.longest_word_length = max((len(word[0]) for word in self.groups))
+        self.lists_by_length = self._get_lists_by_length(MIN_WORD_LEN)
 
     def of(self, word) -> AnagramGroup:
         'Return anagrams of the word given'
